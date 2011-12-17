@@ -1,11 +1,15 @@
 package org.toi.bukkitmon;
 
-import org.bukkit.entity.MobType;
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.CreatureType;
+import org.bukkit.entity.Player;
 
 public class BMMob {
 	
 	private byte nrOfMobs = 1;
-	private MobType mobtype = MobType.CHICKEN;
+	private CreatureType CreatureType = org.bukkit.entity.CreatureType.CHICKEN;
 	private boolean rndAmount = false;
 	private boolean rndType = false;
 	private boolean active = true;
@@ -40,12 +44,12 @@ public class BMMob {
 		this.nrOfMobs = nrOfMobs;
 	}
 
-	public MobType getMobtype() {
-		return mobtype;
+	public CreatureType getCreatureType() {
+		return CreatureType;
 	}
 
-	public void setMobtype(MobType mobtype) {
-		this.mobtype = mobtype;
+	public void setCreatureType(CreatureType CreatureType) {
+		this.CreatureType = CreatureType;
 	}
 
 	public boolean isActive() {
@@ -63,5 +67,7 @@ public class BMMob {
 	public void setMaxAmount(byte maxAmount) {
 		this.maxAmount = maxAmount;
 	}
+	
+
 	
 }

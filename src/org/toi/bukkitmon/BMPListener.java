@@ -6,9 +6,9 @@ import java.util.Hashtable;
 import java.util.Random;
 
 import org.bukkit.ChatColor;
-import org.bukkit.entity.MobType;
+import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerChatEvent;
+//import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerEggThrowEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.plugin.Plugin;
@@ -62,7 +62,7 @@ public class BMPListener extends PlayerListener {
 		BMMob bm = ph.get(player.getName());
 		if (bm.isActive())
 		{
-			MobType[] mts = MobType.values();
+			CreatureType[] mts = CreatureType.values();
 			int rndint = rnd.nextInt(mts.length - 1);
 			if (bm.isRndAmount())
 				event.setNumHatches((byte)rnd.nextInt(bm.getMaxAmount()));
@@ -71,7 +71,7 @@ public class BMPListener extends PlayerListener {
 			if (bm.isRndType())
 			{
 				int c = 0;
-				MobType mt = mts[rndint];
+				CreatureType mt = mts[rndint];
 				while (this.randommobblacklist.contains(mt.getName().toLowerCase()) && c < mts.length)
 				{
 					mt = mts[rnd.nextInt(mts.length - 1)];
@@ -80,7 +80,7 @@ public class BMPListener extends PlayerListener {
 				event.setHatchType(mt);
 			}
 			else
-				event.setHatchType(bm.getMobtype());
+				event.setHatchType(bm.getCreatureType());
 			event.setHatching(true);
 			if (this.announce)
 			{
@@ -99,23 +99,25 @@ public class BMPListener extends PlayerListener {
 			event.setHatching(false);
 	}
 	
-	public void onPlayerCommand(PlayerChatEvent event)
+	public boolean onPlayerCommand(Player player, String[] split)
 	{
-		Player player = event.getPlayer();
-		String[] split = event.getMessage().split(" ");
-		if (split[0].equalsIgnoreCase("/bm"))
-		{
-			if (split.length >= 2)
+		//Player player = event.getPlayer();
+		//String[] split = event.getMessage().split(" ");
+		//if (split[0].equalsIgnoreCase("/bm"))
+		//{
+			if (split.length >= 1)
 			{
 				if (!ph.containsKey(player.getName()))
 					ph.put(player.getName(), new BMMob());
 				BMMob bm = ph.get(player.getName());
-				if (split[1].equalsIgnoreCase("mobs") && this.perms.canPlayerUseCommand(player.getName(), "mobs"))
+				player.sendMessage(""+this.perms.canPlayerUseCommand(player.getName(),"mobs"));
+				player.sendMessage(split[0]+"==mobs:"+split[0].equalsIgnoreCase("mobs"));
+				if (split[0].equalsIgnoreCase("mobs") && this.perms.canPlayerUseCommand(player.getName(), "mobs"))
 				{
-					if (split.length >= 3)
+					if (split.length >= 2)
 					{
 						try{
-							byte val = Byte.valueOf(split[2]);
+							byte val = Byte.valueOf(split[1]);
 							if (val <= bm.getMaxAmount())
 							{
 								bm.setNrOfMobs(val);
@@ -131,43 +133,49 @@ public class BMPListener extends PlayerListener {
 					else
 						player.sendMessage(this.bmStr + "You need to define a number");
 				}
-				else if (split[1].equalsIgnoreCase("mobtype") && this.perms.canPlayerUseCommand(player.getName(), "mobtype"))
+				else if (split[0].equalsIgnoreCase("CreatureType") /*&& this.perms.canPlayerUseCommand(player.getName(), "CreatureType")*/)
 				{
-					if (split.length >= 3)
+					if (split.length >= 2)
 					{
-						MobType mt = MobType.valueOf(split[2].toUpperCase());
-						if (mt != null)
-						{
-							if (!this.mobblacklist.contains(split[2].toLowerCase()))
+						try{
+							CreatureType mt = CreatureType.valueOf(split[1].toUpperCase());
+							if (mt != null)
 							{
-								bm.setMobtype(mt);
-								player.sendMessage(this.bmStr + "You set the mob type to " + split[2]);
+								if (!this.mobblacklist.contains(split[1].toLowerCase()))
+								{
+									bm.setCreatureType(mt);
+									player.sendMessage(this.bmStr + "You set the mob type to " + split[1]);
+								}
+								else
+									player.sendMessage(this.bmStr + split[1] + " is not allowed!");
 							}
 							else
-								player.sendMessage(this.bmStr + split[2] + " is not allowed!");
+								player.sendMessage(this.bmStr + "Invalid CreatureType!");
+						}catch(org.bukkit.command.CommandException E){
+							player.sendMessage("The creature you specified is probably invalid.\n" +
+											   "Usage: /bm creaturetype ");
 						}
-						else
-							player.sendMessage(this.bmStr + "Invalid mobtype!");
+						
 					}
 					else
-						player.sendMessage(this.bmStr + "You need to define a mobtype");
+						player.sendMessage(this.bmStr + "You need to define a CreatureType");
 				}
-				else if (split[1].equalsIgnoreCase("randomamount") && this.perms.canPlayerUseCommand(player.getName(), "randomamount"))
+				else if (split[0].equalsIgnoreCase("randomamount") && this.perms.canPlayerUseCommand(player.getName(), "randomamount"))
 				{
 					bm.setRndAmount(!bm.isRndAmount());
 					player.sendMessage(this.bmStr + "You set random amount to " + bm.isRndAmount());
 				}
-				else if (split[1].equalsIgnoreCase("randomtype") && this.perms.canPlayerUseCommand(player.getName(), "randomtype"))
+				else if (split[0].equalsIgnoreCase("randomtype") && this.perms.canPlayerUseCommand(player.getName(), "randomtype"))
 				{
 					bm.setRndType(!bm.isRndType());
 					player.sendMessage(this.bmStr + "You set random type to " + bm.isRndType());
 				}
-				else if (split[1].equalsIgnoreCase("maxamount") && this.perms.canPlayerUseCommand(player.getName(), "maxamount"))
+				else if (split[0].equalsIgnoreCase("maxamount") && this.perms.canPlayerUseCommand(player.getName(), "maxamount"))
 				{
-					if (split.length >= 3)
+					if (split.length >= 2)
 					{
 						try{
-							byte val = Byte.valueOf(split[2]);
+							byte val = Byte.valueOf(split[1]);
 							bm.setMaxAmount(val);
 							player.sendMessage(this.bmStr + "You set the max amount of mobs to spawn to: " + val);
 						}
@@ -178,7 +186,7 @@ public class BMPListener extends PlayerListener {
 					else
 						player.sendMessage(this.bmStr + "You need to define a number");
 				}
-				else if (split[1].equalsIgnoreCase("activate") && this.perms.canPlayerUseCommand(player.getName(), "activate"))
+				else if (split[0].equalsIgnoreCase("activate") && this.perms.canPlayerUseCommand(player.getName(), "activate"))
 				{
 					bm.setActive(!bm.isActive());
 					if (bm.isActive())
@@ -187,11 +195,11 @@ public class BMPListener extends PlayerListener {
 						player.sendMessage(this.bmStr + "You deactivated BukkitMon");
 					
 				}
-				else if ((split[1].equalsIgnoreCase("list") || split[1].equalsIgnoreCase("list")) && this.perms.canPlayerUseCommand(player.getName(), "list"))
+				else if ((split[0].equalsIgnoreCase("list") || split[0].equalsIgnoreCase("list")))// && this.perms.canPlayerUseCommand(player.getName(), "list"))
 				{
 					player.sendMessage(ChatColor.RED + "BukkitMon commands:");
 					player.sendMessage(ChatColor.RED + "/bm mobs [#]" + ChatColor.YELLOW + " - Define how many mobs to spawn");
-					player.sendMessage(ChatColor.RED + "/bm mobtype [type]" + ChatColor.YELLOW + " - Define the mobtype to spawn");
+					player.sendMessage(ChatColor.RED + "/bm CreatureType [type]" + ChatColor.YELLOW + " - Define the CreatureType to spawn");
 					player.sendMessage(ChatColor.RED + "/bm maxamount" + ChatColor.YELLOW + " - Defines the max amount of mobs you can spawn");
 					player.sendMessage(ChatColor.RED + "/bm randomamount" + ChatColor.YELLOW + " - Toggle random amount on/off");
 					player.sendMessage(ChatColor.RED + "/bm randomtype" + ChatColor.YELLOW + " - Toggle random mob type on/off");
@@ -199,10 +207,11 @@ public class BMPListener extends PlayerListener {
 					player.sendMessage(ChatColor.RED + "/bm list" + ChatColor.YELLOW + " - Shows a list of avaliable BukkitMon commands");
 				}
 				else
-					player.sendMessage(this.bmStr + "Unknown BukkitMon command");
+					player.sendMessage(this.bmStr + "Unknown BukkitMon command (or you don't have permission!)");
 			}
 			else
-				player.sendMessage(this.bmStr + "Define a function please!");
-		}
+				player.sendMessage("perms: "+this.perms.canPlayerUseCommand(player.getName(), "mobs"));
+		//}
+		return true;
 	}
 }

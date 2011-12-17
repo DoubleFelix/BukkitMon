@@ -1,11 +1,11 @@
 package org.bukkitmon;
 
-import org.bukkit.entity.MobType;
+import org.bukkit.entity.CreatureType;
 
 public class BMMob {
 	
 	private byte nrOfMobs = 1;
-	private MobType mobtype = MobType.CHICKEN;
+	private CreatureType creatureType = org.bukkit.entity.CreatureType.CHICKEN;
 	private boolean rndAmount = false;
 	private boolean rndType = false;
 	private boolean active = true;
@@ -40,12 +40,12 @@ public class BMMob {
 		this.nrOfMobs = nrOfMobs;
 	}
 
-	public MobType getMobtype() {
-		return mobtype;
+	public CreatureType getCreatureType() {
+		return creatureType;
 	}
 
-	public void setMobtype(MobType mobtype) {
-		this.mobtype = mobtype;
+	public void setCreatureType(CreatureType creatureType) {
+		this.creatureType = creatureType;
 	}
 
 	public boolean isActive() {

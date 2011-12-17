@@ -1,3 +1,9 @@
 name: BukkitMon
 main: org.toi.bukkitmon.BukkitMon
 version: 0.1
+
+commands:
+ bm:
+  description: This is a test command
+  permission: LightBridge.test
+  usage: /bm stuff
